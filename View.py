@@ -4,8 +4,6 @@ from mysql.connector import Error
 
 
 class MenuScene(tk.Frame):
-    """Start-skærm med knap til at oprette forbindelse."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
 
@@ -21,8 +19,6 @@ class MenuScene(tk.Frame):
 
 
 class ConnectScene(tk.Frame):
-    """Formular til at indtaste databaseoplysninger og oprette forbindelse."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
@@ -73,7 +69,6 @@ class ConnectScene(tk.Frame):
                   command=self.connect_db).pack(pady=20)
 
     def connect_db(self):
-        """Sender forbindelsesdata til controlleren."""
         self.controller.handle_connect(
             host=self.host.get(),
             db=self.database.get(),
@@ -83,8 +78,6 @@ class ConnectScene(tk.Frame):
 
 
 class ManagerScene(tk.Frame):
-    """Oversigtsside med genveje til alle SQL-kommandoer."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
@@ -139,7 +132,6 @@ class ManagerScene(tk.Frame):
                   command=self.slukProgram).pack(pady=20)
 
     def tkraise(self, *args, **kwargs):
-        """Opdater DB-navn i titlen hver gang siden vises."""
         try:
             name = self.controller.handle_get_db_name()
             self.oversigtRubrik.config(text=f"Oversigt, DB: {name}")
@@ -148,13 +140,10 @@ class ManagerScene(tk.Frame):
         super().tkraise(*args, **kwargs)
 
     def slukProgram(self):
-        """Bed controlleren om at lukke forbindelsen."""
         self.controller.handle_disconnect()
 
 
 class SQLScene(tk.Frame):
-    """Fri SQL-konsol — brugeren kan skrive og køre vilkårlige forespørgsler."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
@@ -184,14 +173,11 @@ class SQLScene(tk.Frame):
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
 
     def run_query(self):
-        """Send SQL-forespørgslen til controlleren og vis resultatet."""
         result = self.controller.handle_raw_query(self.query_box.get())
         self.output_text.set(result)
 
 
 class CommandSelectScene(tk.Frame):
-    """SELECT-side — henter og viser alle rækker fra users-tabellen."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
@@ -218,15 +204,12 @@ class CommandSelectScene(tk.Frame):
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
 
     def get_users(self):
-        """Bed controlleren om brugere og vis dem i tabellen."""
         self.output_text.delete(1.0, tk.END)
         result = self.controller.handle_select_users()
         self.output_text.insert(tk.END, result)
 
 
 class CommandUpdateScene(tk.Frame):
-    """UPDATE-side — ikke implementeret endnu."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
 
@@ -244,8 +227,6 @@ class CommandUpdateScene(tk.Frame):
 
 
 class CommandDeleteScene(tk.Frame):
-    """DELETE-side — ikke implementeret endnu."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
 
@@ -263,8 +244,6 @@ class CommandDeleteScene(tk.Frame):
 
 
 class CommandInsertScene(tk.Frame):
-    """INSERT-side — formular til at indsætte en ny række i en tabel."""
-
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
@@ -324,7 +303,6 @@ class CommandInsertScene(tk.Frame):
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
 
     def runInsert(self):
-        """Send INSERT-data til controlleren og vis feedback."""
         result = self.controller.handle_insert(
             table=self.database.get(),
             columns=self.columns.get(),
