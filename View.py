@@ -298,18 +298,90 @@ class CommandUpdateScene(tk.Frame):
 class CommandDeleteScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
+        self.controller = controller
+
+        # Header
+        headerFrame = tk.Frame(self, bg=controller.bg, pady=18)
+        headerFrame.pack(fill="x")
 
         tk.Label(self, text="DELETE",
-                 font=(controller.font, 50),
-                 bg=controller.bg, fg=controller.fg).pack(pady=30)
+                 font=(controller.font, 52, "bold"),
+                 bg=controller.bg, fg="#FFFFFF").pack()
 
-        tk.Label(self, text="IKKE LAVET ENDNU",
-                 font=(controller.font, 40),
-                 bg=controller.bg, fg="red").pack(pady=40)
+        tk.Label(self, text="Permanent fjernelse af rækker fra en tabel",
+                 font=(controller.font, 13, "italic"),
+                 bg=controller.bg, fg="#FFFFFF").pack(pady=10)
 
-        tk.Button(self, text="Tilbage", font=(controller.font, 20),
+        # Warning info
+        warnFrame = tk.Frame(self, bg=controller.bg, pady=8)
+        warnFrame.pack(fill="x", pady=(0, 10))
+
+        tk.Label(warnFrame,
+                 text="DENNE HANDLING KAN IKKE FORTRYDES",
+                 font=(controller.font, 12, "bold"),
+                 fg="#D70A0A",
+                 bg=controller.bg).pack()
+        tk.Label(warnFrame,
+                 text="Syntax:\nDELETE FROM tablename\nWHERE column = 'value'",
+                 font=(controller.font, 16, "bold"),
+                 fg="#FFFFFF",
+                 bg=controller.bg).pack()
+        # Card
+        card = tk.Frame(self, bg=controller.bg, padx=40, pady=30, relief="flat", bd=0)
+        card.pack(pady=10)
+
+        # DELETE 
+        deleteFrame = tk.Frame(card, bg=controller.bg)
+        deleteFrame.pack(pady=10)
+
+        tk.Label(deleteFrame, font=(controller.font, 18), text="DELETE FROM",
+                 bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.table = tk.Entry(deleteFrame, font=(controller.font, 18), width=20,
+                              bg=controller.bbg, fg="#ffffff",
+                              insertbackground="#ffffff",
+                              relief="flat", bd=8)
+        self.table.grid(row=0, column=1, padx=5, pady=5)
+
+        # WHERE box 
+        whereFrame = tk.Frame(card, bg=controller.bg)
+        whereFrame.pack(pady=10)
+
+        tk.Label(whereFrame, font=(controller.font, 18), text="WHERE",
+                 bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        tk.Label(whereFrame, font=(controller.font, 18), text="(",
+                 bg=controller.bg, fg=controller.fg).grid(row=0, column=1, padx=5, pady=5)
+        self.condition = tk.Entry(whereFrame, font=(controller.font, 18), width=40,
+                                  bg=controller.bbg, fg="#ffffff",
+                                  insertbackground="#ffffff",
+                                  relief="flat", bd=8)
+        self.condition.grid(row=0, column=2, padx=0, pady=5)
+        tk.Label(whereFrame, font=(controller.font, 18), text=")",
+                 bg=controller.bg, fg=controller.fg).grid(row=0, column=3, padx=5, pady=5)
+
+        # Output
+        self.outputText = tk.StringVar()
+        tk.Message(self, textvariable=self.outputText, width=600,
+                   font=(controller.font, 12),
+                   bg=controller.bg, fg=controller.fg).pack(pady=20)
+
+        # Buttons tilbage og køre delete
+        shadow = tk.Frame(self, bg="#3a0a0a")
+        shadow.pack(pady=10)
+        tk.Button(shadow, text="🗑 SLET rækker", font=(controller.font, 20, "bold"),
+                  bg="#8b1a1a", fg="#ffffff",activebackground="#a52020",relief="flat"
+                  ,padx=20,pady=8,cursor="hand2",
+                  command=self.runDelete).pack(pady=(0,4),padx=(0,4))
+
+        tk.Button(self, text="Tilbage", font=(controller.font, 14),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+
+    def runDelete(self):
+        result = self.controller.handle_delete(
+            table=self.table.get(),
+            condition=self.condition.get()
+        )
+        self.outputText.set(result)
 
 
 class CommandInsertScene(tk.Frame):
