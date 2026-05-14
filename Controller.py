@@ -42,9 +42,17 @@ class App(tk.Tk):
 
         self.show_frame(MenuScene)
 
-    def show_frame(self, scene):
+    def show_frame(self, scene, fieldsToWipe=None):
         """Løft den ønskede scene frem."""
         self.frames[scene].tkraise()
+        if fieldsToWipe is not None:
+            for field in fieldsToWipe:
+                if isinstance(field, tk.Text):
+                    field.config(state="normal")
+                    field.delete(1.0, tk.END)
+                    field.config(state="disabled")
+                elif isinstance(field, tk.Entry):
+                    field.delete(0, tk.END)
 
     def exit_app(self, event=None):
         self.destroy()
@@ -58,7 +66,7 @@ class App(tk.Tk):
         ok = self.db.connect(host=host, db=db, user=user, password=password)
         if ok:
             self.show_frame(ManageOrUserScene)
-    def handle_delete(self, table, condition):
+    def handle_delete(self, table, condition, tField, cField):
   
         if not self.db.conn:
             return "Ingen database forbindelse"
@@ -66,6 +74,8 @@ class App(tk.Tk):
             return "Fejl: WHERE-krav må ikke være tom — det ville slette alt!"
         try:
             self.db.delete(table=table, condition=condition)
+            tField.delete(0, tk.END)
+            cField.delete(0, tk.END)
             return f"Succes: Rækker slettet fra '{table}' hvor {condition}"
         except Error as e:
             return f"Error: {str(e)}"
@@ -93,50 +103,78 @@ class App(tk.Tk):
     def handle_select_data(self,table):
         if not self.db.conn or not self.db.conn.is_connected():
             return "Ingen database forbindelse",""
+        if table == "" or table is None:
+            return "Ingen tabel defineret! Definer tabel i rullemenuen ovenfor.", ""
         try:
             rows, column_names = self.db.select_all(table=table)
             lines  = "\t\t".join(column_names) + "\n"
             lines += "-" * 102 + "\n"
             lines += "\n".join("\t\t".join(str(item) for item in row) for row in rows)
-            return f"Fetched all data from table:{table}.",lines
+            return f"Fetched {len(rows)} records from table {table}!",lines
         except Error as e:
             return f"Error: {str(e)}",""
 
-    def handle_insert(self, table, columns, values):
+    def handle_insert(self, table, columns, values, tField, cField, vField):
         if not self.db.conn:
             return "Ingen database forbindelse"
         try:
             self.db.insert(table=table, columns=columns, values=values)
+            tField.delete(0, tk.END)
+            cField.delete(0, tk.END)
+            vField.delete(0, tk.END)
             return f"Succes: ({columns}): ({values}) sat ind i '{table}'!"
         except Error as e:
             return f"Error: {str(e)}"
 
-    def handle_update(self, table, setValues, conditions):
+    def handle_update(self, table, setValues, conditions, tField, sVField, cField):
         if not self.db.conn:
             return "Ingen database forbindelse"
         try:
             if conditions == "*":
                 self.db.update(table=table, setValues=setValues, conditions=conditions)
+                tField.delete(0, tk.END)
+                sVField.delete(0, tk.END)
+                cField.delete(0, tk.END)
                 return f"Succes: Updated ({table}) with ({setValues})."
             else:
                 self.db.update(table=table, setValues=setValues, conditions=conditions)
+                tField.delete(0, tk.END)
+                sVField.delete(0, tk.END)
+                cField.delete(0, tk.END)
                 return f"Succes: Updated ({table}) with ({setValues}) where ({conditions})."
         except Error as e:
             return f"Error: {str(e)}"
     
-    def handle_create_user(self, username, password):
+    def handle_create_user(self, username, password, username_entry, password_entry):
         if not self.db.conn:
             return "Ingen database forbindelse"
         try:
-            message = self.db.create_user(username, password)
+            message, wipe = self.db.create_user(username, password)
+            if wipe:
+                username_entry.delete(0, tk.END)
+                password_entry.delete(0, tk.END)
             return message
         except Error as e:
             return f"Error: {str(e)}"
-    def handle_login_user(self, username, password):
+    def handle_login_user(self, username, password, username_entry, password_entry):
         if not self.db.conn:
             return "Ingen database forbindelse"
         try:
-            message = self.db.login_user(username, password)
+            message, wipe = self.db.login_user(username, password)
+            if wipe:
+                username_entry.delete(0, tk.END)
+                password_entry.delete(0, tk.END)
             return message
         except Error as e:
             return f"Error: {str(e)}"
+
+    def handle_select_table_dropdown(self):
+
+        if not self.db.conn:
+            return "Ingen database forbindelse"
+        try:
+            tables = self.db.getTables()
+            return tables
+        except Error as e:
+            return f"Error: {str(e)}"
+

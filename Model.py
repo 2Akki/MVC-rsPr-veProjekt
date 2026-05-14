@@ -28,13 +28,11 @@ class SingletonDBConn:
             messagebox.showerror("Fejl", str(e))
         return False
     def delete(self, table, condition):
-       
         query = f"DELETE FROM {table} WHERE {condition}"
         self.cursor.execute(query)
         self.conn.commit()
     def disconnect(self):
         if self.conn and self.conn.is_connected():
-            self.conn.close()
             self.conn   = None
             self.cursor = None
 
@@ -49,7 +47,13 @@ class SingletonDBConn:
 
     def get_current_database(self):
         self.cursor.execute("SELECT DATABASE();")
-        return self.cursor.fetchone()[0]
+        db = self.cursor.fetchone()[0]
+        return db
+
+    def getTables(self):
+        self.cursor.execute("SHOW TABLES;")
+        tables = self.cursor.fetchall()
+        return tables
 
     def select_all(self, table):
         self.cursor.execute(f"SELECT * FROM {table};")
@@ -74,25 +78,25 @@ class SingletonDBConn:
         self.cursor.execute("SELECT * FROM users WHERE name = %s", (username,))
         result = self.cursor.fetchall()
         if result:
-            return "Navnet er allerede i brug. Skriv et andet navn"
+            return "Navnet er allerede i brug. Skriv et andet navn", False
         else:
             if not self.password_is_valid(password):
-                return "password skal mindst være 8 tegn, indeholde både bogstaver og minimum et tal"
+                return "password skal mindst være 8 tegn, indeholde både bogstaver og minimum et tal", False
             else:
                 self.cursor.execute("insert into users(name, password) values(%s, %s)", (username, password))
                 self.conn.commit()
-                return "Bruger oprettet succesfuldt"
+                return f"Bruger {username} oprettet succesfuldt!", True
     
     def login_user(self, username, password):
         self.cursor.execute("SELECT password FROM users WHERE name = %s", (username,))
         result = self.cursor.fetchall()
         if result:
             if result[0][0] == password:
-                return "Du er logget ind"
+                return f"Du er nu logget ind som {username}!", True
             else:
-                return "Password eller brugernavn er forkert"
+                return "Password eller brugernavn er forkert", False
         else:
-            return "Password eller brugernavn er forkert"
+            return "Password eller brugernavn er forkert", False
         
     def password_is_valid(self, password):
         if len(password) < 8:

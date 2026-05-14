@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 #------------------------Scenen "Menu", håndterer knappen til "Connect til Database" siden, fungerer som startside------------------
 class MenuScene(tk.Frame):
@@ -226,7 +227,7 @@ class SQLScene(tk.Frame):
 
         tk.Button(center, font=(controller.font, 14), text="Tilbage",
                   bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+                  command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.query_box])).pack(pady=10)
 
     def run_query(self):
         result = self.controller.handle_raw_query(self.query_box.get())
@@ -262,7 +263,7 @@ class LoginCreateScene(tk.Frame):
                   command=self.create_user).pack(pady=10)
         tk.Button(self, text="Tilbage", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManageOrUserScene)).pack(pady=100)
+                  command=lambda: controller.show_frame(ManageOrUserScene, fieldsToWipe=[self.username_entry, self.password_entry])).pack(pady=100)
 
         self.output_text = tk.StringVar()
         tk.Message(self, textvariable=self.output_text, width=600,
@@ -271,13 +272,13 @@ class LoginCreateScene(tk.Frame):
     def create_user(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-        result = self.controller.handle_create_user(username, password)
+        result = self.controller.handle_create_user(username, password, self.username_entry, self.password_entry)
         self.output_text.set(result)
 
     def login_user(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-        result = self.controller.handle_login_user(username, password)
+        result = self.controller.handle_login_user(username, password, self.username_entry, self.password_entry)
         self.output_text.set(result)
 
 #---------------------Scenen "Select", håndterer select commandoer i databasen med SQL--------------------
@@ -301,10 +302,41 @@ class CommandSelectScene(tk.Frame):
         selectFrame.pack(pady=10)
 
         tk.Label(selectFrame, text="SELECT * FROM", font=(controller.font, 16), bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
-        self.table = tk.Entry(selectFrame, font=(controller.font, 16), bg=controller.bbg, fg=controller.fg,)
-        self.table.grid(row=0, column=1, padx=5, pady=5)
 
-        self.tableData = tk.Text(self, state="disabled", width=60, height=12, font=(controller.font, 14), bg=controller.bbg, fg=controller.fg)
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+
+        self.style.configure(
+            "Custom.TCombobox", fieldbackground=controller.bbg, background=controller.sbg, foreground=controller.fg, arrowcolor=controller.fg
+        )
+
+        self.style.map(
+            "Custom.TCombobox",
+            fieldbackground=[
+                ("readonly", controller.bbg)
+            ],
+            foreground=[
+                ("readonly", controller.fg)
+            ],
+            selectbackground=[
+                ("readonly", controller.bbg)
+            ],
+            selectforeground=[
+                ("readonly", controller.fg)
+            ]
+        )
+
+        self.option_add("*TCombobox*Listbox.background", controller.bbg)
+        self.option_add("*TCombobox*Listbox.foreground", controller.fg)
+        self.option_add("*TCombobox*Listbox.selectBackground", controller.bbg)
+        self.option_add("*TCombobox*Listbox.selectForeground", controller.fg)
+        self.option_add("*TCombobox*Listbox.font", (controller.font, 16))
+
+        self.tableDropdown = ttk.Combobox(selectFrame, state="readonly", style="Custom.TCombobox", font=(controller.font, 16), postcommand=self.setTables)
+        self.tableDropdown.grid(row=0, column=1, padx=5, pady=5)
+        tk.Button(selectFrame, text=" ⟳ ", font=(controller.font, 16), bg=controller.sbg, fg=controller.fg, command=self.setTables).grid(row=0, column=2, padx=5, pady=5)
+
+        self.tableData = tk.Text(self, state="disabled", width=60, height=12, font=(controller.font, 14), bg=controller.bbg, selectbackground=controller.bbg, fg=controller.fg, selectforeground=controller.fg)
         self.tableData.pack(pady=10)
 
         self.outputText = tk.StringVar()
@@ -316,15 +348,22 @@ class CommandSelectScene(tk.Frame):
 
         tk.Button(self, text="Tilbage", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+                  command=lambda: self.controller.show_frame(ManagerScene, fieldsToWipe=[self.tableData])).pack(pady=10)
 
     def fetchData(self):
-        result,output = self.controller.handle_select_data(table=self.table.get())
+        result,output = self.controller.handle_select_data(table=self.tableDropdown.get())
         self.tableData.config(state="normal")
         self.tableData.delete(1.0, tk.END)
         self.tableData.insert(tk.END, output)
         self.tableData.config(state="disabled")
         self.outputText.set(result)
+
+    def setTables(self):
+        tables = self.controller.handle_select_table_dropdown()
+        self.tableDropdown["values"] = tables
+
+        if tables:
+            self.tableDropdown.current(newindex=0)
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -375,12 +414,15 @@ class CommandUpdateScene(tk.Frame):
 
         tk.Button(self, text="Tilbage", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+                  command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.setValues, self.conditions])).pack(pady=10)
     def runUpdate(self):
         result = self.controller.handle_update(
             table=self.table.get(),
             setValues=self.setValues.get(),
-            conditions=self.conditions.get()
+            conditions=self.conditions.get(),
+            tField=self.table,
+            sVField=self.setValues,
+            cField=self.conditions
         )
         self.outputText.set(result)
 
@@ -464,12 +506,14 @@ class CommandDeleteScene(tk.Frame):
 
         tk.Button(self, text="Tilbage", font=(controller.font, 14),
                   bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+                  command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.condition])).pack(pady=10)
 
     def runDelete(self):
         result = self.controller.handle_delete(
             table=self.table.get(),
-            condition=self.condition.get()
+            condition=self.condition.get(),
+            tField=self.table,
+            cField=self.condition
         )
         self.outputText.set(result)
 
@@ -516,12 +560,15 @@ class CommandInsertScene(tk.Frame):
 
         tk.Button(self, text="RUN INSERT", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg, command=self.runInsert).pack(pady=10)
 
-        tk.Button(self, text="Tilbage", font=(controller.font, 14), bg=controller.sbg, fg=controller.fg, command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+        tk.Button(self, text="Tilbage", font=(controller.font, 14), bg=controller.sbg, fg=controller.fg, command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.columns, self.values])).pack(pady=10)
 
     def runInsert(self):
         result = self.controller.handle_insert(
             table=self.table.get(),
             columns=self.columns.get(),
-            values=self.values.get()
+            values=self.values.get(),
+            tField=self.table,
+            cField=self.columns,
+            vField=self.values
         )
         self.outputText.set(result)
