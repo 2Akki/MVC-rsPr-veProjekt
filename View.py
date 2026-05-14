@@ -1,82 +1,107 @@
 import tkinter as tk
-from tkinter import messagebox
-from mysql.connector import Error
 
-
+#------------------------Scenen "Menu", håndterer knappen til "Connect til Database" siden, fungerer som startside------------------
 class MenuScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
 
-        tk.Label(self, text="SQL Manager",
-                 font=(controller.font, 50),
-                 bg=controller.bg, fg=controller.fg).pack(pady=40)
+        # Label/Overskrift i toppen af siden
+        tk.Label(self, text="SQL Manager", font=(controller.font, 50), bg=controller.bg, fg=controller.fg).pack(pady=40)
 
-        tk.Button(self, text="Opret forbindelse",
-                  font=(controller.font, 24),
+        # En knap, der fører til siden "ConnectScene"
+        tk.Button(self, text="Opret forbindelse", font=(controller.font, 24),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ConnectScene)
                   ).pack(pady=20)
 
-
+#------------Scenen "Connect til Database", håndterer oprettelsen til databasen-------------------
 class ConnectScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
 
+        # Label/Overskrift i toppen af siden
         tk.Label(self, text="Forbind til database",
                  font=(controller.font, 40),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
+        # En "frame" der holder alle inputfelterne brugt til at forbinde til databasen
         connectionFrame = tk.Frame(self, bg=controller.bg)
         connectionFrame.pack(pady=20)
 
-        # Host
+        # -----Label/Tekst og inputfelt til inputtet "Host"-----
+
+        # Label
         tk.Label(connectionFrame, text="Host:", font=(controller.font, 20),
                  bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=0, pady=10)
+
+        # Inputfelt
         self.host = tk.Entry(connectionFrame, font=(controller.font, 20),
                              bg=controller.bbg, fg=controller.fg)
+
+        #Auto-insert af teksten "localhost" i inputfeltet "Host"
         self.host.insert(0, "localhost")
         self.host.grid(row=0, column=1, padx=10, pady=10)
 
-        # Database
+        # -----Label/Tekst og inputfelt til inputtet "Database" dvs. database navn-----
+
+        # Label
         tk.Label(connectionFrame, text="Database:", font=(controller.font, 20),
                  bg=controller.bg, fg=controller.fg).grid(row=1, column=0, padx=0, pady=10)
+
+        # Inputfelt
         self.database = tk.Entry(connectionFrame, font=(controller.font, 20),
                                  bg=controller.bbg, fg=controller.fg)
-        self.database.insert(0, "akki")
+
+        # Auto-insert af teksten "årsprøve" i inputfeltet "Database"
+        self.database.insert(0, "årsprøve")
         self.database.grid(row=1, column=1, padx=10, pady=10)
 
-        # User
+        # -----Label/Tekst og inputfelt til "User", dvs. navnet af den bruger der skal logge ind på databasen-----
+
+        # Label
         tk.Label(connectionFrame, text="User:", font=(controller.font, 20),
                  bg=controller.bg, fg=controller.fg).grid(row=2, column=0, padx=0, pady=10)
+
+
+        # Inputfelt
         self.user = tk.Entry(connectionFrame, font=(controller.font, 20),
                              bg=controller.bbg, fg=controller.fg)
-        self.user.insert(0, "Akki")
+
+        # Auto-insert af teksten "nullermanden" i inputfeltet "User"
+        self.user.insert(0, "nullermanden")
         self.user.grid(row=2, column=1, padx=10, pady=10)
 
-        # Password
+        # -----Label/Tekst og inputfelt til "Password", dvs. det korresponderende password til den valgte bruger-----
+
+        # Label
         tk.Label(connectionFrame, text="Password:", font=(controller.font, 20),
                  bg=controller.bg, fg=controller.fg).grid(row=3, column=0, padx=0, pady=10)
-        self.password = tk.Entry(connectionFrame, show="*",
-                                 font=(controller.font, 20),
+
+        # Inputfelt
+        self.password = tk.Entry(connectionFrame, show="*", font=(controller.font, 20),
                                  bg=controller.bbg, fg=controller.fg)
-        self.password.insert(0, "BigDickRandy")
+
+        # Mulighed for at bruge Auto-insert til inputfeltet "Password"
+        self.password.insert(0, "")
         self.password.grid(row=3, column=1, padx=10, pady=10)
 
+        # Knap, der bruger informationerne fra inputfelterne ovenfor til at oprette forbindelse til en database
         tk.Button(self, text="Opret forbindelse",
                   font=(controller.font, 24),
                   bg=controller.sbg, fg=controller.fg,
                   command=self.connect_db).pack(pady=20)
 
+    # Funktion til håndtering af oprettelsen af en forbindelse til databasen
     def connect_db(self):
         self.controller.handle_connect(
-            host=self.host.get(),
-            db=self.database.get(),
-            user=self.user.get(),
-            password=self.password.get()
+            host=self.host.get(), # "Host" inputfelt
+            db=self.database.get(), # "Database" inputfelt
+            user=self.user.get(), # "User" inputfelt
+            password=self.password.get() # "Password" inputfelt
         )
 
-
+#---------------Scenen "Database Manager", håndterer navigation igennem appens forskellige sider----------------
 class ManagerScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -142,7 +167,7 @@ class ManagerScene(tk.Frame):
     def slukProgram(self):
         self.controller.handle_disconnect()
 
-
+#---------------------------Scenen "SQL", håndterer håndlavede kommandoer til avanceret brug af databasen-------------------
 class SQLScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -176,7 +201,7 @@ class SQLScene(tk.Frame):
         result = self.controller.handle_raw_query(self.query_box.get())
         self.output_text.set(result)
 
-
+#---------------------Scenen "Select", håndterer select commandoer i databasen med SQL--------------------
 class CommandSelectScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -209,6 +234,7 @@ class CommandSelectScene(tk.Frame):
         self.output_text.insert(tk.END, result)
 
 
+#-------------------SKAL LAVES--------------------
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -263,44 +289,29 @@ class CommandInsertScene(tk.Frame):
         insertFrame = tk.Frame(self, bg=controller.bg)
         insertFrame.pack(pady=10)
 
-        tk.Label(insertFrame, font=(controller.font, 18), text="INSERT INTO",
-                 bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
-        self.database = tk.Entry(insertFrame, font=(controller.font, 18), width=10,
-                                 bg=controller.bbg, fg=controller.fg)
+        tk.Label(insertFrame, font=(controller.font, 18), text="INSERT INTO", bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.database = tk.Entry(insertFrame, font=(controller.font, 18), width=10, bg=controller.bbg, fg=controller.fg)
         self.database.grid(row=0, column=1, padx=5, pady=5)
-        tk.Label(insertFrame, font=(controller.font, 18), text="(",
-                 bg=controller.bg, fg=controller.fg).grid(row=0, column=2, padx=5, pady=5)
-        self.columns = tk.Entry(insertFrame, font=(controller.font, 18), width=20,
-                                bg=controller.bbg, fg=controller.fg)
+        tk.Label(insertFrame, font=(controller.font, 18), text="(", bg=controller.bg, fg=controller.fg).grid(row=0, column=2, padx=5, pady=5)
+        self.columns = tk.Entry(insertFrame, font=(controller.font, 18), width=20, bg=controller.bbg, fg=controller.fg)
         self.columns.grid(row=0, column=3, padx=0, pady=5)
-        tk.Label(insertFrame, font=(controller.font, 18), text=")",
-                 bg=controller.bg, fg=controller.fg).grid(row=0, column=4, padx=5, pady=5)
+        tk.Label(insertFrame, font=(controller.font, 18), text=")", bg=controller.bg, fg=controller.fg).grid(row=0, column=4, padx=5, pady=5)
 
         insertFrame2 = tk.Frame(self, bg=controller.bg)
         insertFrame2.pack(pady=10)
 
-        tk.Label(insertFrame2, font=(controller.font, 18), text="VALUES",
-                 bg=controller.bg, fg=controller.fg).grid(row=1, column=0, padx=5, pady=5)
-        tk.Label(insertFrame2, font=(controller.font, 18), text="(",
-                 bg=controller.bg, fg=controller.fg).grid(row=1, column=1, padx=5, pady=5)
-        self.values = tk.Entry(insertFrame2, font=(controller.font, 18), width=40,
-                               bg=controller.bbg, fg=controller.fg)
+        tk.Label(insertFrame2, font=(controller.font, 18), text="VALUES", bg=controller.bg, fg=controller.fg).grid(row=1, column=0, padx=5, pady=5)
+        tk.Label(insertFrame2, font=(controller.font, 18), text="(", bg=controller.bg, fg=controller.fg).grid(row=1, column=1, padx=5, pady=5)
+        self.values = tk.Entry(insertFrame2, font=(controller.font, 18), width=40, bg=controller.bbg, fg=controller.fg)
         self.values.grid(row=1, column=2, padx=0, pady=5)
-        tk.Label(insertFrame2, font=(controller.font, 18), text=")",
-                 bg=controller.bg, fg=controller.fg).grid(row=1, column=3, padx=5, pady=5)
+        tk.Label(insertFrame2, font=(controller.font, 18), text=")", bg=controller.bg, fg=controller.fg).grid(row=1, column=3, padx=5, pady=5)
 
         self.outputText = tk.StringVar()
-        tk.Message(self, textvariable=self.outputText, width=600,
-                   font=(controller.font, 12),
-                   bg=controller.bg, fg=controller.fg).pack(pady=20)
+        tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg, fg=controller.fg).pack(pady=20)
 
-        tk.Button(self, text="RUN INSERT", font=(controller.font, 20),
-                  bg=controller.sbg, fg=controller.fg,
-                  command=self.runInsert).pack(pady=10)
+        tk.Button(self, text="RUN INSERT", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg, command=self.runInsert).pack(pady=10)
 
-        tk.Button(self, text="Tilbage", font=(controller.font, 14),
-                  bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+        tk.Button(self, text="Tilbage", font=(controller.font, 14), bg=controller.sbg, fg=controller.fg, command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
 
     def runInsert(self):
         result = self.controller.handle_insert(
