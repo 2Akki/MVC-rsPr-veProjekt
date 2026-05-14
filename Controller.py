@@ -24,7 +24,7 @@ class App(tk.Tk):
         self.db = SDBConn() 
 
         self.title("SQL Manager")
-        self.width  = 1150
+        self.width  = 1260
         self.height = 825
         self.geometry(f"{self.width}x{self.height}")
 
