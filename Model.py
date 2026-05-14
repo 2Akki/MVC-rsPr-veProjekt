@@ -67,3 +67,36 @@ class SDBConn:
         query = f"UPDATE {table} SET {setValues} WHERE {conditions}"
         self.cursor.execute(str(query))
         self.conn.commit()
+    
+    def create_user(self, username, password):
+        self.cursor.execute("SELECT * FROM users WHERE name = %s", (username,))
+        result = self.cursor.fetchall()
+        if result:
+            return "Navnet er allerede i brug. Skriv et andet navn"
+        else:
+            if not self.password_is_valid(password):
+                return "password skal mindst være 8 tegn, indeholde både bogstaver og minimum et tal"
+            else:
+                self.cursor.execute("insert into users(name, password) values(%s, %s)", (username, password))
+                self.conn.commit()
+                return "Bruger oprettet succesfuldt"
+    
+    def login_user(self, username, password):
+        self.cursor.execute("SELECT password FROM users WHERE name = %s", (username,))
+        result = self.cursor.fetchall()
+        if result:
+            if result[0][0] == password:
+                return "Du er logget ind"
+            else:
+                return "Password eller brugernavn er forkert"
+        else:
+            return "Password eller brugernavn er forkert"
+        
+    def password_is_valid(self, password):
+        if len(password) < 8:
+            return False
+        if not any(char.isdigit() for char in password):
+            return False
+        if not any(char.isalpha() for char in password):
+            return False
+        return True
