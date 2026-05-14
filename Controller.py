@@ -124,19 +124,21 @@ class App(tk.Tk):
         except Error as e:
             return f"Error: {str(e)}"
     
-    def handle_create_user(self, username, password):
-        if not self.db.conn:
+    def handle_create_user(self, username, password): # checker om brugeren allerede findes i databasen og opretter den hvis ikke
+        if not self.db.conn: # checker om der er forbindelse til databasen
             return "Ingen database forbindelse"
         try:
-            message = self.db.create_user(username, password)
-            return message
+            message = self.db.create_user(username, password) # checker om brugeren allerede findes i databasen og opretter den hvis ikke (sender checket og oprettelsen til Model).
+            return message # returnerer beskeden fra Model (om oprettelse var succesfuldt eller ej) til View. LoginCreateScene.create_user() håndterer så beskeden og viser den i en messagebox.
         except Error as e:
-            return f"Error: {str(e)}"
-    def handle_login_user(self, username, password):
-        if not self.db.conn:
+            return f"Error: {str(e)}" # returnerer eventuelle fejl til View, som håndterer det i LoginCreateScene.create_user() og viser det i en messagebox.
+        
+    def handle_login_user(self, username, password): # checker om brugeren findes i databasen og om passwordet er korrekt
+        if not self.db.conn: # checker om der er forbindelse til databasen
             return "Ingen database forbindelse"
         try:
-            message = self.db.login_user(username, password)
-            return message
+            message = self.db.login_user(username, password) # checker om brugeren er i databasen og om passwordet er korrekt (sender checket til Model).
+            return message # returnerer beskeden fra Model (om login var succesfuldt eller ej) til View. LoginCreateScene.login_user() håndterer så beskeden og viser den i en messagebox.
         except Error as e:
-            return f"Error: {str(e)}"
+            return f"Error: {str(e)}" # returnerer eventuelle fejl til View, som håndterer det i LoginCreateScene.login_user() og viser det i en messagebox.
+
