@@ -91,17 +91,17 @@ class App(tk.Tk):
         except Error as e:
             return f"Error: {str(e)}"
 
-    def handle_select_users(self):
+    def handle_select_data(self,table):
         if not self.db.conn or not self.db.conn.is_connected():
-            return "No database connection."
+            return "Ingen database forbindelse",""
         try:
-            rows, column_names = self.db.select_all("users")
-            lines  = "\t".join(column_names) + "\n"
+            rows, column_names = self.db.select_all(table=table)
+            lines  = "\t\t".join(column_names) + "\n"
             lines += "-" * 102 + "\n"
-            lines += "\n".join("\t".join(str(item) for item in row) for row in rows)
-            return lines
+            lines += "\n".join("\t\t".join(str(item) for item in row) for row in rows)
+            return f"Fetched all data from table:{table}.",lines
         except Error as e:
-            return f"Error: {str(e)}"
+            return f"Error: {str(e)}",""
 
     def handle_insert(self, table, columns, values):
         if not self.db.conn:

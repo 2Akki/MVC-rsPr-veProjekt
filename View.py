@@ -290,28 +290,41 @@ class CommandSelectScene(tk.Frame):
                  font=(controller.font, 50),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
-        tk.Label(self, text="All data from users table:",
-                 font=(controller.font, 30),
+        tk.Label(self,
+                 text="Fetch all data from specified table."
+                      "\n\n Syntax:"
+                      "\n SELECT * FROM tablename",
+                 font=(controller.font, 16),
                  bg=controller.bg, fg=controller.fg).pack(pady=10)
 
-        self.output_text = tk.Text(self, width=60, height=12,
-                                   font=(controller.font, 14),
-                                   bg=controller.bbg, fg=controller.fg)
-        self.output_text.pack(pady=10)
+        selectFrame = tk.Frame(self, bg=controller.bg)
+        selectFrame.pack(pady=10)
 
-        tk.Button(self, text="Get Users", font=(controller.font, 15),
+        tk.Label(selectFrame, text="SELECT * FROM", font=(controller.font, 16), bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.table = tk.Entry(selectFrame, font=(controller.font, 16), bg=controller.bbg, fg=controller.fg,)
+        self.table.grid(row=0, column=1, padx=5, pady=5)
+
+        self.tableData = tk.Text(self, state="disabled", width=60, height=12, font=(controller.font, 14), bg=controller.bbg, fg=controller.fg)
+        self.tableData.pack(pady=10)
+
+        self.outputText = tk.StringVar()
+        tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg, fg=controller.fg).pack(pady=20)
+
+        tk.Button(self, text="Fetch Data", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
-                  command=self.get_users).pack(pady=6)
+                  command=self.fetchData).pack(pady=6)
 
         tk.Button(self, text="Tilbage", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
 
-    def get_users(self):
-        self.output_text.delete(1.0, tk.END)
-        result = self.controller.handle_select_users()
-        self.output_text.insert(tk.END, result)
-#-------------------SKAL LAVES--------------------
+    def fetchData(self):
+        result,output = self.controller.handle_select_data(table=self.table.get())
+        self.tableData.config(state="normal")
+        self.tableData.delete(1.0, tk.END)
+        self.tableData.insert(tk.END, output)
+        self.tableData.config(state="disabled")
+        self.outputText.set(result)
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
