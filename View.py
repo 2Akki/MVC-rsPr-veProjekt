@@ -238,18 +238,59 @@ class CommandSelectScene(tk.Frame):
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
+        self.controller = controller
 
         tk.Label(self, text="UPDATE",
                  font=(controller.font, 50),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
-        tk.Label(self, text="IKKE LAVET ENDNU",
-                 font=(controller.font, 40),
-                 bg=controller.bg, fg="red").pack(pady=40)
+        tk.Label(self,
+                 text="Update data in a specified table where specific conditions are met."
+                      "\n\n Syntax:"
+                      "\n UPDATE tablename"
+                      "\n SET column1 = value1, column2 = value2, ..."
+                      "\n WHERE condition1 = condvalue1, condition2 = condvalue2, ..."
+                      "\n Text is written in 'text' except for column names. "
+                      "\n Write * in the WHERE clause if you want to update ALL records.",
+                 font=(controller.font, 16),
+                 bg=controller.bg, fg=controller.fg).pack(pady=20)
+
+        updateFrame = tk.Frame(self, bg=controller.bg)
+        updateFrame.pack(pady=10)
+
+        tk.Label(updateFrame, font=(controller.font, 18), text="UPDATE", bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.table = tk.Entry(updateFrame, font=(controller.font, 18), width=20, bg=controller.bbg, fg=controller.fg)
+        self.table.grid(row=0, column=1, padx=5, pady=5)
+
+        updateFrame2 = tk.Frame(self, bg=controller.bg)
+        updateFrame2.pack(pady=10)
+
+        tk.Label(updateFrame2, font=(controller.font, 18), text="SET", bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.setValues = tk.Entry(updateFrame2, font=(controller.font, 18), width=40, bg=controller.bbg, fg=controller.fg)
+        self.setValues.grid(row=0, column=1, padx=0, pady=5)
+
+        updateFrame3 = tk.Frame(self, bg=controller.bg)
+        updateFrame3.pack(pady=10)
+
+        tk.Label(updateFrame3, font=(controller.font, 18), text="WHERE", bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
+        self.conditions = tk.Entry(updateFrame3, font=(controller.font, 18), width=30, bg=controller.bbg, fg=controller.fg)
+        self.conditions.grid(row=0, column=1, padx=0, pady=5)
+
+        self.outputText = tk.StringVar()
+        tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg,
+                   fg=controller.fg).pack(pady=20)
+
+        tk.Button(self, text="RUN UPDATE", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg,
+                  command=self.runUpdate).pack(pady=10)
 
         tk.Button(self, text="Tilbage", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
+    def runUpdate(self):
+        result = self.controller.handle_insert(
+            table=self.table.get(),
+        )
+        self.outputText.set(result)
 
 
 class CommandDeleteScene(tk.Frame):
@@ -290,8 +331,8 @@ class CommandInsertScene(tk.Frame):
         insertFrame.pack(pady=10)
 
         tk.Label(insertFrame, font=(controller.font, 18), text="INSERT INTO", bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=5, pady=5)
-        self.database = tk.Entry(insertFrame, font=(controller.font, 18), width=10, bg=controller.bbg, fg=controller.fg)
-        self.database.grid(row=0, column=1, padx=5, pady=5)
+        self.table = tk.Entry(insertFrame, font=(controller.font, 18), width=10, bg=controller.bbg, fg=controller.fg)
+        self.table.grid(row=0, column=1, padx=5, pady=5)
         tk.Label(insertFrame, font=(controller.font, 18), text="(", bg=controller.bg, fg=controller.fg).grid(row=0, column=2, padx=5, pady=5)
         self.columns = tk.Entry(insertFrame, font=(controller.font, 18), width=20, bg=controller.bbg, fg=controller.fg)
         self.columns.grid(row=0, column=3, padx=0, pady=5)
@@ -315,7 +356,7 @@ class CommandInsertScene(tk.Frame):
 
     def runInsert(self):
         result = self.controller.handle_insert(
-            table=self.database.get(),
+            table=self.table.get(),
             columns=self.columns.get(),
             values=self.values.get()
         )
