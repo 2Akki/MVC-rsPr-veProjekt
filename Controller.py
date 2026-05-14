@@ -178,4 +178,3 @@ class App(tk.Tk):
             return tables
         except Error as e:
             return f"Error: {str(e)}"
-

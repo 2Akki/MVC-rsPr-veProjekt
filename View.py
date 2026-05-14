@@ -225,7 +225,7 @@ class SQLScene(tk.Frame):
                    font=(controller.font, 12),
                    bg=controller.bg, fg=controller.fg).pack(pady=20)
 
-        tk.Button(center, font=(controller.font, 14), text="Tilbage",
+        tk.Button(center, font=(controller.font, 15), text="Tilbage",
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.query_box])).pack(pady=10)
 
@@ -257,18 +257,20 @@ class LoginCreateScene(tk.Frame):
 
         tk.Button(self, text="Login", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
-                  command=self.login_user).pack(pady=10)
+                  command=self.login_user).pack(pady=15)
         tk.Button(self, text="Opret bruger", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
-                  command=self.create_user).pack(pady=10)
-        tk.Button(self, text="Tilbage", font=(controller.font, 20),
-                  bg=controller.sbg, fg=controller.fg,
-                  command=lambda: controller.show_frame(ManageOrUserScene, fieldsToWipe=[self.username_entry, self.password_entry])).pack(pady=100)
+                  command=self.create_user).pack(pady=15)
 
         self.output_text = tk.StringVar()
         tk.Message(self, textvariable=self.output_text, width=600,
                    font=(controller.font, 12),
                    bg=controller.bg, fg=controller.fg).pack(pady=20)
+
+        tk.Button(self, text="Tilbage", font=(controller.font, 15),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=lambda: controller.show_frame(ManageOrUserScene, fieldsToWipe=[self.username_entry, self.password_entry])).pack(pady=20)
+
     def create_user(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
@@ -288,11 +290,11 @@ class CommandSelectScene(tk.Frame):
         self.controller = controller
 
         tk.Label(self, text="SELECT",
-                 font=(controller.font, 50),
+                 font=(controller.font, 52, "bold"),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
         tk.Label(self,
-                 text="Fetch all data from specified table."
+                 text="Hent al data fra den bestemte tabel."
                       "\n\n Syntax:"
                       "\n SELECT * FROM tablename",
                  font=(controller.font, 16),
@@ -342,7 +344,7 @@ class CommandSelectScene(tk.Frame):
         self.outputText = tk.StringVar()
         tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg, fg=controller.fg).pack(pady=20)
 
-        tk.Button(self, text="Fetch Data", font=(controller.font, 15),
+        tk.Button(self, text="HENT DATA", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
                   command=self.fetchData).pack(pady=6)
 
@@ -370,19 +372,19 @@ class CommandUpdateScene(tk.Frame):
         self.controller = controller
 
         tk.Label(self, text="UPDATE",
-                 font=(controller.font, 50),
+                 font=(controller.font, 52, "bold"),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
         tk.Label(self,
-                 text="Update data in a specified table where specific conditions are met."
+                 text="Opdater dataen i en specifik tabel hvor de bestemte betingelser er sande."
                       "\n\n Syntax:"
                       "\n UPDATE tablename"
                       "\n SET column1 = value1, column2 = value2, ..."
                       "\n WHERE condition1 = condvalue1, condition2 = condvalue2, ..."
-                      "\n Text is written in 'text' except for column names. "
-                      "\n Write * in the WHERE clause if you want to update ALL records.",
+                      "\n\n Tekst er skrevet i citationstegn, gælder ikke for tabel- eller kolonnenavne. "
+                      "\n Skriv * i WHERE feltet hvis du vil opdatere ALLE mulige værdier.",
                  font=(controller.font, 16),
-                 bg=controller.bg, fg=controller.fg).pack(pady=20)
+                 bg=controller.bg, fg=controller.fg).pack(pady=15)
 
         updateFrame = tk.Frame(self, bg=controller.bg)
         updateFrame.pack(pady=10)
@@ -409,10 +411,10 @@ class CommandUpdateScene(tk.Frame):
         tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg,
                    fg=controller.fg).pack(pady=20)
 
-        tk.Button(self, text="RUN UPDATE", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg,
+        tk.Button(self, text="OPDATER", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg,
                   command=self.runUpdate).pack(pady=10)
 
-        tk.Button(self, text="Tilbage", font=(controller.font, 20),
+        tk.Button(self, text="Tilbage", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.setValues, self.conditions])).pack(pady=10)
     def runUpdate(self):
@@ -440,7 +442,7 @@ class CommandDeleteScene(tk.Frame):
                  font=(controller.font, 52, "bold"),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
-        tk.Label(self, text="Permanent fjernelse af rækker fra en tabel",
+        tk.Label(self, text="Fjern data fra en tabel permanent.",
                  font=(controller.font, 13, "italic"),
                  bg=controller.bg, fg=controller.fg).pack(pady=10)
 
@@ -450,12 +452,12 @@ class CommandDeleteScene(tk.Frame):
 
         tk.Label(warnFrame,
                  text="DENNE HANDLING KAN IKKE FORTRYDES",
-                 font=(controller.font, 12, "bold"),
-                 fg="#D71A1A",
-                 bg=controller.bg).pack()
+                 font=(controller.font, 16, "bold"),
+                 fg=controller.fg,
+                 bg="#a52020").pack()
         tk.Label(warnFrame,
                  text="Syntax:\nDELETE FROM tablename\nWHERE column = 'value'",
-                 font=(controller.font, 16, "bold"),
+                 font=(controller.font, 16),
                  fg=controller.fg,
                  bg=controller.bg).pack()
         # Card
@@ -504,7 +506,7 @@ class CommandDeleteScene(tk.Frame):
                   ,padx=20,pady=8,cursor="hand2",
                   command=self.runDelete).pack(pady=(0,4),padx=(0,4))
 
-        tk.Button(self, text="Tilbage", font=(controller.font, 14),
+        tk.Button(self, text="Tilbage", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.condition])).pack(pady=10)
 
@@ -524,14 +526,15 @@ class CommandInsertScene(tk.Frame):
         self.controller = controller
 
         tk.Label(self, text="INSERT",
-                 font=(controller.font, 50),
+                 font=(controller.font, 52, "bold"),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
         tk.Label(self,
-                 text="Insert data into a specified table."
+                 text="Indsæt data i en bestemt tabel."
                       "\n\n Syntax:"
                       "\n INSERT INTO tablename(column1, column2...)"
-                      "\n VALUES(value1, value2)",
+                      "\n VALUES(value1, value2)"
+                      "\n Tekst skrives i citationstegn, gælder ikke for tabel- og kolonnenavne.",
                  font=(controller.font, 16),
                  bg=controller.bg, fg=controller.fg).pack(pady=20)
 
@@ -558,7 +561,7 @@ class CommandInsertScene(tk.Frame):
         self.outputText = tk.StringVar()
         tk.Message(self, textvariable=self.outputText, width=600, font=(controller.font, 12), bg=controller.bg, fg=controller.fg).pack(pady=20)
 
-        tk.Button(self, text="RUN INSERT", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg, command=self.runInsert).pack(pady=10)
+        tk.Button(self, text="KØR INDSÆT", font=(controller.font, 20), bg=controller.sbg, fg=controller.fg, command=self.runInsert).pack(pady=10)
 
         tk.Button(self, text="Tilbage", font=(controller.font, 14), bg=controller.sbg, fg=controller.fg, command=lambda: controller.show_frame(ManagerScene, fieldsToWipe=[self.table, self.columns, self.values])).pack(pady=10)
 
