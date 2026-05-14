@@ -58,7 +58,17 @@ class App(tk.Tk):
         ok = self.db.connect(host=host, db=db, user=user, password=password)
         if ok:
             self.show_frame(ManagerScene)
-
+    def handle_delete(self, table, condition):
+  
+        if not self.db.conn:
+            return "Ingen database forbindelse"
+        if not condition.strip():
+            return "Fejl: WHERE-krav må ikke være tom — det ville slette alt!"
+        try:
+            self.db.delete(table=table, condition=condition)
+            return f"Succes: Rækker slettet fra '{table}' hvor {condition}"
+        except Error as e:
+            return f"Error: {str(e)}"
     def handle_disconnect(self):
         if self.db.conn and self.db.conn.is_connected():
             self.db.disconnect()
