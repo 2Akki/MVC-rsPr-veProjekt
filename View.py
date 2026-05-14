@@ -18,7 +18,7 @@ class MenuScene(tk.Frame):
 class ConnectScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
-        self.controller = controller
+        self.controller = controller # Får fat i vores Controller.py script så vi kan bruge programmets funktioner og beholde MVC-strukturen
 
         # Label/Overskrift i toppen af siden
         tk.Label(self, text="Forbind til database",
@@ -83,7 +83,7 @@ class ConnectScene(tk.Frame):
                                  bg=controller.bbg, fg=controller.fg)
 
         # Mulighed for at bruge Auto-insert til inputfeltet "Password"
-        self.password.insert(0, "")
+        self.password.insert(0, "Password")
         self.password.grid(row=3, column=1, padx=10, pady=10)
 
         # Knap, der bruger informationerne fra inputfelterne ovenfor til at oprette forbindelse til en database
@@ -105,26 +105,29 @@ class ConnectScene(tk.Frame):
 class ManagerScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
-        self.controller = controller
+        self.controller = controller # Får fat i vores Controller.py script så vi kan bruge programmets funktioner og beholde MVC-strukturen
 
-        self.oversigtRubrik = tk.Label(self, text="Oversigt, DB: None",
-                                       font=(controller.font, 50),
-                                       bg=controller.bg, fg=controller.fg)
+        # Overskrift til siden, viser hvilken database man er tilsluttet til.
+        self.oversigtRubrik = tk.Label(self, text="Oversigt, DB: None", font=(controller.font, 50), bg=controller.bg, fg=controller.fg)
         self.oversigtRubrik.pack(pady=30)
 
+        # Knap der fører til siden "SQL Konsol", bruger en tkinter knap med en lambda funktion for at skifte til den rigtige Scene
         tk.Button(self, text="SQL Konsol",
                   font=(controller.font, 28),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(SQLScene)
                   ).pack(pady=20)
 
+        # Label ovenfor knapperne der fører til de forskellige "pre-made" SQL kommando Scener
         tk.Label(self, text="SQL kommandoer",
                  font=(controller.font, 40),
                  bg=controller.bg, fg=controller.fg).pack(pady=20)
 
+        # En tkinter frame der holder på knapperne samt deres Labels
         commandFrame = tk.Frame(self, bg=controller.bg)
         commandFrame.pack(pady=20)
 
+        # Labels til de forskellige knapper der fører til kommando Scener
         tk.Label(commandFrame, font=(controller.font, 18), text="Hent data fra tabel",
                  bg=controller.bg, fg=controller.fg).grid(row=0, column=0)
         tk.Label(commandFrame, font=(controller.font, 18), text="Indsæt ny data",
@@ -134,6 +137,7 @@ class ManagerScene(tk.Frame):
         tk.Label(commandFrame, font=(controller.font, 18), text="Slet data fra tabel",
                  bg=controller.bg, fg=controller.fg).grid(row=2, column=1)
 
+        # Knapper der fører til kommando scener
         tk.Button(commandFrame, text="SELECT", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(CommandSelectScene)
@@ -151,11 +155,13 @@ class ManagerScene(tk.Frame):
                   command=lambda: controller.show_frame(CommandDeleteScene)
                   ).grid(row=3, column=1, padx=20, pady=10)
 
+        # Knappen der slukker for database forbindelsen og går til "Main Menu" scenen igen
         tk.Button(self, text="Sluk Program",
                   font=(controller.font, 14),
                   bg=controller.sbg, fg=controller.fg,
                   command=self.slukProgram).pack(pady=20)
 
+    # Funktion der skriver navnet af databasen i overskriften. Henter database navnet fra controller.py
     def tkraise(self, *args, **kwargs):
         try:
             name = self.controller.handle_get_db_name()
@@ -164,6 +170,7 @@ class ManagerScene(tk.Frame):
             self.oversigtRubrik.config(text="Oversigt, DB: Ukendt")
         super().tkraise(*args, **kwargs)
 
+    # Funktion der slukker database forbindelse og derefter skifter til "Main Menu" scenen. Kører en funktion i controller.py
     def slukProgram(self):
         self.controller.handle_disconnect()
 
@@ -171,7 +178,7 @@ class ManagerScene(tk.Frame):
 class SQLScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
-        self.controller = controller
+        self.controller = controller # Får fat i vores Controller.py script så vi kan bruge programmets funktioner og beholde MVC-strukturen
 
         center = tk.Frame(self, bg=controller.bg)
         center.pack(expand=True)
