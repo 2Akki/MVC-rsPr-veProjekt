@@ -220,7 +220,7 @@ class CommandSelectScene(tk.Frame):
 
         tk.Label(self, text="All data from users table:",
                  font=(controller.font, 30),
-                 bg=controller.bg, fg="blue").pack(pady=10)
+                 bg=controller.bg, fg=controller.fg).pack(pady=10)
 
         self.output_text = tk.Text(self, width=60, height=12,
                                    font=(controller.font, 14),
@@ -313,11 +313,11 @@ class CommandDeleteScene(tk.Frame):
 
         tk.Label(self, text="DELETE",
                  font=(controller.font, 52, "bold"),
-                 bg=controller.bg, fg="#FFFFFF").pack()
+                 bg=controller.bg, fg=controller.fg).pack(pady=30)
 
         tk.Label(self, text="Permanent fjernelse af rækker fra en tabel",
                  font=(controller.font, 13, "italic"),
-                 bg=controller.bg, fg="#FFFFFF").pack(pady=10)
+                 bg=controller.bg, fg=controller.fg).pack(pady=10)
 
         # Warning info
         warnFrame = tk.Frame(self, bg=controller.bg, pady=8)
@@ -326,12 +326,12 @@ class CommandDeleteScene(tk.Frame):
         tk.Label(warnFrame,
                  text="DENNE HANDLING KAN IKKE FORTRYDES",
                  font=(controller.font, 12, "bold"),
-                 fg="#D70A0A",
+                 fg="#D71A1A",
                  bg=controller.bg).pack()
         tk.Label(warnFrame,
                  text="Syntax:\nDELETE FROM tablename\nWHERE column = 'value'",
                  font=(controller.font, 16, "bold"),
-                 fg="#FFFFFF",
+                 fg=controller.fg,
                  bg=controller.bg).pack()
         # Card
         card = tk.Frame(self, bg=controller.bg, padx=40, pady=30, relief="flat", bd=0)

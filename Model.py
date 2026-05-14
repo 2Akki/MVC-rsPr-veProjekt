@@ -54,7 +54,7 @@ class SDBConn:
 
     def select_all(self, table):
         self.cursor.execute(f"SELECT * FROM {table};")
-        rows         = self.cursor.fetchall()
+        rows = self.cursor.fetchall()
         column_names = [desc[0] for desc in self.cursor.description]
         return rows, column_names
 
@@ -64,6 +64,9 @@ class SDBConn:
         self.conn.commit()
 
     def update(self, table, setValues, conditions):
-        query = f"UPDATE {table} SET {setValues} WHERE {conditions}"
+        if conditions == "*":
+            query = f"UPDATE {table} SET {setValues}"
+        else:
+            query = f"UPDATE {table} SET {setValues} WHERE {conditions}"
         self.cursor.execute(str(query))
         self.conn.commit()

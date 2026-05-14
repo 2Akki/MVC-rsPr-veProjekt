@@ -115,7 +115,11 @@ class App(tk.Tk):
         if not self.db.conn:
             return "Ingen database forbindelse"
         try:
-            self.db.update(table=table, setValues=setValues, conditions=conditions)
-            return f"Succes: Updated ({table}) with ({setValues}) where ({conditions})."
+            if conditions == "*":
+                self.db.update(table=table, setValues=setValues, conditions=conditions)
+                return f"Succes: Updated ({table}) with ({setValues})."
+            else:
+                self.db.update(table=table, setValues=setValues, conditions=conditions)
+                return f"Succes: Updated ({table}) with ({setValues}) where ({conditions})."
         except Error as e:
             return f"Error: {str(e)}"
