@@ -4,9 +4,10 @@ from mysql.connector import Error
 
 from Model import SDBConn
 from View import (
-    MenuScene, ConnectScene, ManagerScene, SQLScene,
+    ManageOrUserScene, MenuScene, ConnectScene, ManagerScene, SQLScene,
     CommandSelectScene, CommandDeleteScene,
-    CommandUpdateScene, CommandInsertScene
+    CommandUpdateScene, CommandInsertScene,
+    LoginCreateScene
 )
 
 
@@ -33,9 +34,9 @@ class App(tk.Tk):
         self.bind_all("<Escape>", self.exit_app)
 
         self.frames = {}
-        for F in (MenuScene, ConnectScene, SQLScene, ManagerScene,
+        for F in (MenuScene, ManageOrUserScene, ConnectScene, SQLScene, ManagerScene,
                   CommandSelectScene, CommandDeleteScene,
-                  CommandUpdateScene, CommandInsertScene):
+                  CommandUpdateScene, CommandInsertScene, LoginCreateScene):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew", padx=215)
@@ -57,7 +58,7 @@ class App(tk.Tk):
         """
         ok = self.db.connect(host=host, db=db, user=user, password=password)
         if ok:
-            self.show_frame(ManagerScene)
+            self.show_frame(ManageOrUserScene)
     def handle_delete(self, table, condition):
   
         if not self.db.conn:
@@ -117,5 +118,22 @@ class App(tk.Tk):
         try:
             self.db.update(table=table, setValues=setValues, conditions=conditions)
             return f"Succes: Updated ({table}) with ({setValues}) where ({conditions})."
+        except Error as e:
+            return f"Error: {str(e)}"
+    
+    def handle_create_user(self, username, password):
+        if not self.db.conn:
+            return "Ingen database forbindelse"
+        try:
+            message = self.db.create_user(username, password)
+            return message
+        except Error as e:
+            return f"Error: {str(e)}"
+    def handle_login_user(self, username, password):
+        if not self.db.conn:
+            return "Ingen database forbindelse"
+        try:
+            message = self.db.login_user(username, password)
+            return message
         except Error as e:
             return f"Error: {str(e)}"
