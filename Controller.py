@@ -24,7 +24,7 @@ class App(tk.Tk):
 
         self.title("SQL Manager")
         self.width  = 1150
-        self.height = 700
+        self.height = 825
         self.geometry(f"{self.width}x{self.height}")
 
         container = tk.Frame(self, bg=self.bg)
@@ -86,7 +86,7 @@ class App(tk.Tk):
         try:
             rows, column_names = self.db.select_all("users")
             lines  = "\t".join(column_names) + "\n"
-            lines += "-" * 110 + "\n"
+            lines += "-" * 102 + "\n"
             lines += "\n".join("\t".join(str(item) for item in row) for row in rows)
             return lines
         except Error as e:
@@ -98,5 +98,14 @@ class App(tk.Tk):
         try:
             self.db.insert(table=table, columns=columns, values=values)
             return f"Succes: ({columns}): ({values}) sat ind i '{table}'!"
+        except Error as e:
+            return f"Error: {str(e)}"
+
+    def handle_update(self, table, setValues, conditions):
+        if not self.db.conn:
+            return "Ingen database forbindelse"
+        try:
+            self.db.update(table=table, setValues=setValues, conditions=conditions)
+            return f"Succes: Updated ({table}) with ({setValues}) where ({conditions})."
         except Error as e:
             return f"Error: {str(e)}"

@@ -58,3 +58,8 @@ class SDBConn:
         query = f"INSERT INTO {table}({columns}) VALUES({values})"
         self.cursor.execute(str(query))
         self.conn.commit()
+
+    def update(self, table, setValues, conditions):
+        query = f"UPDATE {table} SET {setValues} WHERE {conditions}"
+        self.cursor.execute(str(query))
+        self.conn.commit()

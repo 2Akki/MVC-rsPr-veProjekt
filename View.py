@@ -287,8 +287,10 @@ class CommandUpdateScene(tk.Frame):
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene)).pack(pady=10)
     def runUpdate(self):
-        result = self.controller.handle_insert(
+        result = self.controller.handle_update(
             table=self.table.get(),
+            setValues=self.setValues.get(),
+            conditions=self.conditions.get()
         )
         self.outputText.set(result)
 
