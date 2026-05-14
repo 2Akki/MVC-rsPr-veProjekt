@@ -28,7 +28,11 @@ class SDBConn:
         except Error as e:
             messagebox.showerror("Fejl", str(e))
         return False
-
+    def delete(self, table, condition):
+       
+        query = f"DELETE FROM {table} WHERE {condition}"
+        self.cursor.execute(query)
+        self.conn.commit()
     def disconnect(self):
         if self.conn and self.conn.is_connected():
             self.conn.close()
