@@ -100,7 +100,33 @@ class ConnectScene(tk.Frame):
             user=self.user.get(), # "User" inputfelt
             password=self.password.get() # "Password" inputfelt
         )
+#------------------------Scenen "Manage eller User", valg mellem at manage eller logge ind på en user--------------------------
+class ManageOrUserScene(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg=controller.bg)
+        self.controller = controller
 
+        tk.Label(self, text="Hvad vil du gøre?",
+                 font=(controller.font, 40),
+                 bg=controller.bg, fg=controller.fg).pack(pady=30)
+
+        tk.Button(self, text="SQL Konsol",
+                  font=(controller.font, 28),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=lambda: controller.show_frame(ManagerScene)
+                  ).pack(pady=20)
+
+        tk.Button(self, text="Login/Opret bruger",
+                  font=(controller.font, 28),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=lambda: controller.show_frame(LoginCreateScene)
+                  ).pack(pady=20)
+        tk.Button(self, text="Sluk Program",
+                  font=(controller.font, 14),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=self.slukProgram).pack(pady=200)
+    def slukProgram(self):
+        self.controller.handle_disconnect()
 #---------------Scenen "Database Manager", håndterer navigation igennem appens forskellige sider----------------
 class ManagerScene(tk.Frame):
     def __init__(self, parent, controller):
@@ -155,11 +181,9 @@ class ManagerScene(tk.Frame):
                   command=lambda: controller.show_frame(CommandDeleteScene)
                   ).grid(row=3, column=1, padx=20, pady=10)
 
-        # Knappen der slukker for database forbindelsen og går til "Main Menu" scenen igen
-        tk.Button(self, text="Sluk Program",
-                  font=(controller.font, 14),
+        tk.Button(self, text="Manage Eller Login", font=(controller.font, 14),
                   bg=controller.sbg, fg=controller.fg,
-                  command=self.slukProgram).pack(pady=20)
+                  command=lambda: controller.show_frame(ManageOrUserScene)).pack(pady=10)
 
     # Funktion der skriver navnet af databasen i overskriften. Henter database navnet fra controller.py
     def tkraise(self, *args, **kwargs):
@@ -208,6 +232,54 @@ class SQLScene(tk.Frame):
         result = self.controller.handle_raw_query(self.query_box.get())
         self.output_text.set(result)
 
+#-----------------Scene "Login/Create", Hvor brugeren kan intaste sit login og opdatere serveren--------------------
+class LoginCreateScene(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg=controller.bg)
+        self.controller = controller
+
+        tk.Label(self, text="Login / Opret bruger",
+                 font=(controller.font, 40),
+                 bg=controller.bg, fg=controller.fg).pack(pady=30)
+
+        tk.Label(self, text="Username:", font=(controller.font, 20),
+                 bg=controller.bg, fg=controller.fg).pack(pady=10)
+        self.username_entry = tk.Entry(self, font=(controller.font, 20), width=30,
+                 bg=controller.bbg, fg=controller.fg)
+        self.username_entry.pack(pady=10)
+
+        tk.Label(self, text="Password:", font=(controller.font, 20),
+                 bg=controller.bg, fg=controller.fg).pack(pady=10)
+        self.password_entry = tk.Entry(self, font=(controller.font, 20), width=30,
+                bg=controller.bbg, fg=controller.fg)
+        self.password_entry.pack(pady=10)
+
+        tk.Button(self, text="Login", font=(controller.font, 20),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=self.login_user).pack(pady=10)
+        tk.Button(self, text="Opret bruger", font=(controller.font, 20),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=self.create_user).pack(pady=10)
+        tk.Button(self, text="Tilbage", font=(controller.font, 20),
+                  bg=controller.sbg, fg=controller.fg,
+                  command=lambda: controller.show_frame(ManageOrUserScene)).pack(pady=100)
+
+        self.output_text = tk.StringVar()
+        tk.Message(self, textvariable=self.output_text, width=600,
+                   font=(controller.font, 12),
+                   bg=controller.bg, fg=controller.fg).pack(pady=20)
+    def create_user(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        result = self.controller.handle_create_user(username, password)
+        self.output_text.set(result)
+
+    def login_user(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        result = self.controller.handle_login_user(username, password)
+        self.output_text.set(result)
+
 #---------------------Scenen "Select", håndterer select commandoer i databasen med SQL--------------------
 class CommandSelectScene(tk.Frame):
     def __init__(self, parent, controller):
@@ -239,8 +311,6 @@ class CommandSelectScene(tk.Frame):
         self.output_text.delete(1.0, tk.END)
         result = self.controller.handle_select_users()
         self.output_text.insert(tk.END, result)
-
-
 #-------------------SKAL LAVES--------------------
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
