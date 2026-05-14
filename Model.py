@@ -2,8 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from tkinter import messagebox
 
-
-class SDBConn:
+class SingletonDBConn:
     _instance = None
 
     def __new__(cls):

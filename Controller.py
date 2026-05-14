@@ -2,14 +2,13 @@ import tkinter as tk
 from tkinter import messagebox
 from mysql.connector import Error
 
-from Model import SDBConn
+from Model import SingletonDBConn
 from View import (
     ManageOrUserScene, MenuScene, ConnectScene, ManagerScene, SQLScene,
     CommandSelectScene, CommandDeleteScene,
     CommandUpdateScene, CommandInsertScene,
     LoginCreateScene
 )
-
 
 class App(tk.Tk):
     bg = "#755060"
@@ -21,7 +20,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.db = SDBConn() 
+        self.db = SingletonDBConn()
 
         self.title("SQL Manager")
         self.width  = 1260
