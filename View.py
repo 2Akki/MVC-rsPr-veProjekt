@@ -130,7 +130,7 @@ class ManageOrUserScene(tk.Frame):
                  font=(controller.font, 40),
                  bg=controller.bg, fg=controller.fg).pack(pady=30)
 
-        tk.Button(self, text="SQL Konsol",
+        tk.Button(self, text="SQL Manager",
                   font=(controller.font, 28),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManagerScene)
@@ -201,7 +201,7 @@ class ManagerScene(tk.Frame):
                   command=lambda: controller.show_frame(CommandDeleteScene)
                   ).grid(row=3, column=1, padx=20, pady=10)
 
-        tk.Button(self, text="Manage Eller Login", font=(controller.font, 14),
+        tk.Button(self, text="Tilbage", font=(controller.font, 15),
                   bg=controller.sbg, fg=controller.fg,
                   command=lambda: controller.show_frame(ManageOrUserScene)).pack(pady=10)
 
