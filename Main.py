@@ -1,4 +1,10 @@
 from Controller import App
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+
+class Main:
+    def start(self):
+        if __name__ == "__main__":
+            app = App()
+            app.mainloop()
+
+program = Main()
+program.start()
