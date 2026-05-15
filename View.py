@@ -20,6 +20,7 @@ class ConnectScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller # Får fat i vores Controller.py script så vi kan bruge programmets funktioner og beholde MVC-strukturen
+        self.passButtonState = 1
 
         # Label/Overskrift i toppen af siden
         tk.Label(self, text="Forbind til database",
@@ -83,6 +84,10 @@ class ConnectScene(tk.Frame):
         self.password = tk.Entry(connectionFrame, show="*", font=(controller.font, 20),
                                  bg=controller.bbg, fg=controller.fg)
 
+        self.passPrivButton = tk.Button(connectionFrame, text=" ⌣ ", font=(controller.font, 20, "bold"), width=3,
+                                        bg=controller.sbg, fg=controller.fg, command=self.passPrivacyButton)
+        self.passPrivButton.grid(row=3, column=2, padx=0, pady=10)
+
         # Mulighed for at bruge Auto-insert til inputfeltet "Password"
         self.password.insert(0, "Password")
         self.password.grid(row=3, column=1, padx=10, pady=10)
@@ -101,6 +106,20 @@ class ConnectScene(tk.Frame):
             user=self.user.get(), # "User" inputfelt
             password=self.password.get() # "Password" inputfelt
         )
+
+    def passPrivacyButton(self):
+        button = self.passPrivButton
+        passEntry = self.password
+
+        if self.passButtonState == 1:
+            button.config(text=" 👁 ")
+            passEntry.config(show="")
+            self.passButtonState = -1
+
+        elif self.passButtonState == -1:
+            button.config(text=" ⌣ ")
+            passEntry.config(show="*")
+            self.passButtonState = 1
 #------------------------Scenen "Manage eller User", valg mellem at manage eller logge ind på en user--------------------------
 class ManageOrUserScene(tk.Frame):
     def __init__(self, parent, controller):
@@ -238,22 +257,27 @@ class LoginCreateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
+        self.passButtonState = 1
 
         tk.Label(self, text="Login / Opret bruger",
-                 font=(controller.font, 40),
-                 bg=controller.bg, fg=controller.fg).pack(pady=30)
+                 font=(controller.font, 52, "bold"),
+                 bg=controller.bg, fg=controller.fg).pack(pady=60)
 
-        tk.Label(self, text="Username:", font=(controller.font, 20),
-                 bg=controller.bg, fg=controller.fg).pack(pady=10)
-        self.username_entry = tk.Entry(self, font=(controller.font, 20), width=30,
-                 bg=controller.bbg, fg=controller.fg)
-        self.username_entry.pack(pady=10)
+        userLogCreateFrame = tk.Frame(self, bg=controller.bg)
+        userLogCreateFrame.pack(pady=20, anchor="n", padx=10)
 
-        tk.Label(self, text="Password:", font=(controller.font, 20),
-                 bg=controller.bg, fg=controller.fg).pack(pady=10)
-        self.password_entry = tk.Entry(self, font=(controller.font, 20), width=30,
-                bg=controller.bbg, fg=controller.fg)
-        self.password_entry.pack(pady=10)
+        tk.Label(userLogCreateFrame, text="Brugernavn:", font=(controller.font, 20),
+                 bg=controller.bg, fg=controller.fg).grid(row=0, column=0, padx=10, pady=20)
+        self.username_entry = tk.Entry(userLogCreateFrame, font=(controller.font, 20), width=30, bg=controller.bbg, fg=controller.fg)
+        self.username_entry.grid(row=0, column=1, padx=10, pady=20)
+
+        tk.Label(userLogCreateFrame, text="Password:", font=(controller.font, 20), bg=controller.bg, fg=controller.fg).grid(row=1, column=0, padx=10, pady=20)
+
+        self.password_entry = tk.Entry(userLogCreateFrame, font=(controller.font, 20), show="*", width=30, bg=controller.bbg, fg=controller.fg)
+        self.password_entry.grid(row=1, column=1, padx=10, pady=20)
+
+        self.passPrivButton = tk.Button(userLogCreateFrame, text=" ⌣ ", font=(controller.font, 20, "bold"), width=3, bg=controller.sbg, fg=controller.fg, command=self.passPrivacyButton)
+        self.passPrivButton.grid(row=1, column=2, padx=10, pady=20)
 
         tk.Button(self, text="Login", font=(controller.font, 20),
                   bg=controller.sbg, fg=controller.fg,
@@ -282,6 +306,20 @@ class LoginCreateScene(tk.Frame):
         password = self.password_entry.get()
         result = self.controller.handle_login_user(username, password, self.username_entry, self.password_entry)
         self.output_text.set(result)
+
+    def passPrivacyButton(self):
+        button = self.passPrivButton
+        passEntry = self.password_entry
+
+        if self.passButtonState == 1:
+            button.config(text=" 👁 ")
+            passEntry.config(show="")
+            self.passButtonState = -1
+
+        elif self.passButtonState == -1:
+            button.config(text=" ⌣ ")
+            passEntry.config(show="*")
+            self.passButtonState = 1
 
 #---------------------Scenen "Select", håndterer select commandoer i databasen med SQL--------------------
 class CommandSelectScene(tk.Frame):
@@ -334,9 +372,10 @@ class CommandSelectScene(tk.Frame):
         self.option_add("*TCombobox*Listbox.selectForeground", controller.fg)
         self.option_add("*TCombobox*Listbox.font", (controller.font, 16))
 
-        self.tableDropdown = ttk.Combobox(selectFrame, state="readonly", style="Custom.TCombobox", font=(controller.font, 16), postcommand=self.setTables)
+        self.tableDropdown = ttk.Combobox(selectFrame, state="readonly", style="Custom.TCombobox", font=(controller.font, 16), postcommand=lambda:self.setTables(False))
         self.tableDropdown.grid(row=0, column=1, padx=5, pady=5)
         tk.Button(selectFrame, text=" ⟳ ", font=(controller.font, 16), bg=controller.sbg, fg=controller.fg, command=self.setTables).grid(row=0, column=2, padx=5, pady=5)
+        tk.Button(selectFrame, text="Auto-generér tabeller", font=(controller.font, 16), bg=controller.sbg, fg=controller.fg, command=self.autoGenerateTables).grid(row=0, column=3, padx=5, pady=5)
 
         self.tableData = tk.Text(self, state="disabled", width=60, height=12, font=(controller.font, 14), bg=controller.bbg, selectbackground=controller.bbg, fg=controller.fg, selectforeground=controller.fg)
         self.tableData.pack(pady=10)
@@ -360,12 +399,21 @@ class CommandSelectScene(tk.Frame):
         self.tableData.config(state="disabled")
         self.outputText.set(result)
 
-    def setTables(self):
+    def setTables(self, resDropdown=True):
         tables = self.controller.handle_select_table_dropdown()
         self.tableDropdown["values"] = tables
 
-        if tables:
+        if tables and resDropdown:
             self.tableDropdown.current(newindex=0)
+
+    def autoGenerateTables(self):
+        self.setTables()
+        self.controller.handle_raw_query("CREATE TABLE IF NOT EXISTS users(id int PRIMARY KEY  AUTO_INCREMENT, name VARCHAR(255), password VARCHAR(255))")
+        self.controller.handle_raw_query("CREATE TABLE IF NOT EXISTS admins(id int PRIMARY KEY  AUTO_INCREMENT, name VARCHAR(255), password VARCHAR(255))")
+        self.controller.handle_raw_query("CREATE TABLE IF NOT EXISTS guests(id int PRIMARY KEY  AUTO_INCREMENT, name VARCHAR(255), password VARCHAR(255))")
+        self.outputText.set("Created tables: users, admins & guests if they didn't already exist.")
+
+# ------------------------------------Scenen "Update", håndterer opdatering og ændring af data i en tabel--------------------------------
 class CommandUpdateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -428,7 +476,7 @@ class CommandUpdateScene(tk.Frame):
         )
         self.outputText.set(result)
 
-
+# ------------------------------------Scenen "Delete", håndterer sletning af data i en tabel--------------------------------
 class CommandDeleteScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
@@ -519,7 +567,7 @@ class CommandDeleteScene(tk.Frame):
         )
         self.outputText.set(result)
 
-
+# ------------------------------------Scenen "Insert", håndterer indsættelse af data i en tabel--------------------------------
 class CommandInsertScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
