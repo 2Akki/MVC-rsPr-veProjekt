@@ -92,11 +92,11 @@ class SingletonDBConn:
         result = self.cursor.fetchall()
         if result:
             if result[0][0] == password:
-                return f"Du er nu logget ind som {username}!", True
+                return "", True, username
             else:
-                return "Password eller brugernavn er forkert", False
+                return "Password eller brugernavn er forkert", False, None
         else:
-            return "Password eller brugernavn er forkert", False
+            return "Password eller brugernavn er forkert", False, None
         
     def password_is_valid(self, password):
         if len(password) < 8:

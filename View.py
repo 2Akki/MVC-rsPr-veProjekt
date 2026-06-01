@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
+from pygame._sdl2 import controller
+
+
 #------------------------Scenen "Menu", håndterer knappen til "Connect til Database" siden, fungerer som startside------------------
 class MenuScene(tk.Frame):
     def __init__(self, parent, controller):
@@ -154,7 +157,7 @@ class ManagerScene(tk.Frame):
         self.controller = controller # Får fat i vores Controller.py script så vi kan bruge programmets funktioner og beholde MVC-strukturen
 
         # Overskrift til siden, viser hvilken database man er tilsluttet til.
-        self.oversigtRubrik = tk.Label(self, text="Oversigt, DB: None", font=(controller.font, 50), bg=controller.bg, fg=controller.fg)
+        self.oversigtRubrik = tk.Label(self, text="Oversigt, DB: None", font=(controller.font, 52, "bold"), bg=controller.bg, fg=controller.fg)
         self.oversigtRubrik.pack(pady=30)
 
         # Knap der fører til siden "SQL Konsol", bruger en tkinter knap med en lambda funktion for at skifte til den rigtige Scene
@@ -252,11 +255,12 @@ class SQLScene(tk.Frame):
         result = self.controller.handle_raw_query(self.query_box.get())
         self.output_text.set(result)
 
-#-----------------Scene "Login/Create", Hvor brugeren kan intaste sit login og opdatere serveren--------------------
+#-----------------Scene "Login/Create", Hvor brugeren kan indtaste sit login og opdatere serveren--------------------
 class LoginCreateScene(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=controller.bg)
         self.controller = controller
+        self.user = ""
         self.passButtonState = 1
 
         tk.Label(self, text="Login / Opret bruger",
@@ -304,8 +308,10 @@ class LoginCreateScene(tk.Frame):
     def login_user(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-        result = self.controller.handle_login_user(username, password, self.username_entry, self.password_entry)
+        result, login = self.controller.handle_login_user(username, password, self.username_entry, self.password_entry)
         self.output_text.set(result)
+        if login:
+            self.controller.show_frame(UserPage)
 
     def passPrivacyButton(self):
         button = self.passPrivButton
@@ -320,6 +326,47 @@ class LoginCreateScene(tk.Frame):
             button.config(text=" ⌣ ")
             passEntry.config(show="*")
             self.passButtonState = 1
+
+#-------------------------------Scenen "User Page", viser hvilken bruger man er loget ind som------------------------
+class UserPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg=controller.bg)
+        self.controller = controller
+
+        self.welcomeText = tk.Label(self, text=f"Velkommen Bruger!",font=(controller.font, 52, "bold"),bg=controller.bg, fg=controller.fg)
+        self.welcomeText.pack(pady=60)
+
+        self.userOverview = tk.Text(self, width=60, height=12, font=(controller.font, 14),bg=controller.bbg, selectbackground=controller.bbg, fg=controller.fg,selectforeground=controller.fg)
+        self.userOverview.pack(pady=20)
+
+        self.userOverview.insert(tk.END, f"[En masse spændende bruger information]")
+        self.userOverview.config(state="disabled")
+
+        userButtonsFrame = tk.Frame(self, bg=controller.bg)
+        userButtonsFrame.pack(pady=10)
+
+        self.homeButton = tk.Button(userButtonsFrame, font=(controller.font, 24, "bold"), text=" ⌂ ", bg=controller.dbg,
+                                    fg=controller.fg, state="disabled")
+        self.homeButton.grid(row=0, column=0, padx=20, pady=10)
+
+        self.settingsButton = tk.Button(userButtonsFrame, font=(controller.font, 24, "bold"), text="⚙",
+                                        bg=controller.dbg, fg=controller.fg, state="disabled")
+        self.settingsButton.grid(row=0, column=1, padx=20, pady=10)
+
+        self.logoutButton = tk.Button(userButtonsFrame, font=(controller.font, 15, "bold"), text=" ⤶ Logout ",
+                                      bg=controller.sbg, fg=controller.fg, command=self.logout)
+        self.logoutButton.grid(row=1, column=0, padx=10, pady=30, columnspan=2)
+
+    def tkraise(self, *args, **kwargs):
+        try:
+            username = self.controller.handle_get_username()
+            self.welcomeText.config(text=f"Velkommen {username}!")
+        except Exception:
+            self.welcomeText.config(text="Velkommen Bruger!")
+        super().tkraise(*args, **kwargs)
+
+    def logout(self):
+        self.controller.show_frame(LoginCreateScene)
 
 #---------------------Scenen "Select", håndterer select commandoer i databasen med SQL--------------------
 class CommandSelectScene(tk.Frame):

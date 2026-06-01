@@ -7,7 +7,7 @@ from View import (
     ManageOrUserScene, MenuScene, ConnectScene, ManagerScene, SQLScene,
     CommandSelectScene, CommandDeleteScene,
     CommandUpdateScene, CommandInsertScene,
-    LoginCreateScene
+    LoginCreateScene, UserPage
 )
 
 class App(tk.Tk):
@@ -15,12 +15,14 @@ class App(tk.Tk):
     fg = "#ffffff"
     sbg = "#856070"
     bbg = "#191922"
+    dbg = "#97838B"
     font = "Georgia"
 
     def __init__(self):
         super().__init__()
 
         self.db = SingletonDBConn()
+        self.username = ""
 
         self.title("SQL Manager")
         self.width  = 1260
@@ -35,7 +37,7 @@ class App(tk.Tk):
         self.frames = {}
         for F in (MenuScene, ManageOrUserScene, ConnectScene, SQLScene, ManagerScene,
                   CommandSelectScene, CommandDeleteScene,
-                  CommandUpdateScene, CommandInsertScene, LoginCreateScene):
+                  CommandUpdateScene, CommandInsertScene, LoginCreateScene, UserPage):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew", padx=215)
@@ -172,27 +174,29 @@ class App(tk.Tk):
             return f"Fejl: {str(e)}" # returnerer eventuelle fejl til View, som håndterer det i LoginCreateScene.create_user() og viser det i en messagebox.
     def handle_login_user(self, username, password, username_entry, password_entry): # checker om brugeren findes i databasen og om passwordet er korrekt
         if not self.db.conn: # checker om der er forbindelse til databasen
-            return "Fejl: Ingen database forbindelse"
+            return "Fejl: Ingen database forbindelse", False
         try:
             if username == "" or password == "":
                 if username == "" and password == "":
-                    return "Brugernavn eller password kan ikke være blankt."
+                    return "Brugernavn eller password kan ikke være blankt.", False
                 elif username == "":
-                    return "Brugernavn kan ikke være blankt."
+                    return "Brugernavn kan ikke være blankt.", False
                 elif password == "":
-                    return "Password kan ikke være blankt."
+                    return "Password kan ikke være blankt.", False
                 else:
                     return None
             else:
-                message, wipe = self.db.login_user(username, password)  # checker om brugeren allerede findes i databasen og opretter den hvis ikke (sender checket og oprettelsen til Model).
+                message, wipe, username = self.db.login_user(username, password)  # checker om brugeren allerede findes i databasen og opretter den hvis ikke (sender checket og oprettelsen til Model).
+                self.username = username
             if wipe:
                 username_entry.delete(0, tk.END)
                 password_entry.delete(0, tk.END)
-            return message # returnerer beskeden fra Model (om login var succesfuldt eller ej) til View. LoginCreateScene.login_user() håndterer så beskeden og viser den i en messagebox.
+            return message, wipe # returnerer beskeden fra Model (om login var succesfuldt eller ej) til View. LoginCreateScene.login_user() håndterer så beskeden og viser den i en messagebox.
         except Error as e:
-            return f"Fejl: {str(e)}" # returnerer eventuelle fejl til View, som håndterer det i LoginCreateScene.login_user() og viser det i en messagebox.
-
-
+            return f"Fejl: {str(e)}", False # returnerer eventuelle fejl til View, som håndterer det i LoginCreateScene.login_user() og viser det i en messagebox.
+    def handle_get_username(self):
+        username = self.username
+        return username
     def handle_select_table_dropdown(self): # Håndterer dropdown menuen i selectScene
 
         if not self.db.conn: # Hvis der ikke er en database forbindelse returnerer det som en error
