@@ -45,7 +45,7 @@ class ConnectScene(tk.Frame):
                              bg=controller.bbg, fg=controller.fg)
 
         #Auto-insert af teksten "localhost" i inputfeltet "Host"
-        self.host.insert(0, "localhost")
+        
         self.host.grid(row=0, column=1, padx=10, pady=10)
 
         # -----Label/Tekst og inputfelt til inputtet "Database" dvs. database navn-----
@@ -59,7 +59,7 @@ class ConnectScene(tk.Frame):
                                  bg=controller.bbg, fg=controller.fg)
 
         # Auto-insert af teksten "årsprøve" i inputfeltet "Database"
-        self.database.insert(0, "årsprøve")
+       
         self.database.grid(row=1, column=1, padx=10, pady=10)
 
         # -----Label/Tekst og inputfelt til "User", dvs. navnet af den bruger der skal logge ind på databasen-----
@@ -74,7 +74,7 @@ class ConnectScene(tk.Frame):
                              bg=controller.bbg, fg=controller.fg)
 
         # Auto-insert af teksten "nullermanden" i inputfeltet "User"
-        self.user.insert(0, "nullermanden")
+        
         self.user.grid(row=2, column=1, padx=10, pady=10)
 
         # -----Label/Tekst og inputfelt til "Password", dvs. det korresponderende password til den valgte bruger-----
@@ -92,7 +92,7 @@ class ConnectScene(tk.Frame):
         self.passPrivButton.grid(row=3, column=2, padx=0, pady=10)
 
         # Mulighed for at bruge Auto-insert til inputfeltet "Password"
-        self.password.insert(0, "Password")
+       
         self.password.grid(row=3, column=1, padx=10, pady=10)
 
         # Knap, der bruger informationerne fra inputfelterne ovenfor til at oprette forbindelse til en database
