@@ -44,7 +44,7 @@ class ConnectScene(tk.Frame):
         self.host = tk.Entry(connectionFrame, font=(controller.font, 20),
                              bg=controller.bbg, fg=controller.fg)
 
-        #Auto-insert af teksten "localhost" i inputfeltet "Host"
+      
         
         self.host.grid(row=0, column=1, padx=10, pady=10)
 
@@ -58,7 +58,7 @@ class ConnectScene(tk.Frame):
         self.database = tk.Entry(connectionFrame, font=(controller.font, 20),
                                  bg=controller.bbg, fg=controller.fg)
 
-        # Auto-insert af teksten "årsprøve" i inputfeltet "Database"
+        
        
         self.database.grid(row=1, column=1, padx=10, pady=10)
 
@@ -73,7 +73,7 @@ class ConnectScene(tk.Frame):
         self.user = tk.Entry(connectionFrame, font=(controller.font, 20),
                              bg=controller.bbg, fg=controller.fg)
 
-        # Auto-insert af teksten "nullermanden" i inputfeltet "User"
+        
         
         self.user.grid(row=2, column=1, padx=10, pady=10)
 
@@ -91,7 +91,7 @@ class ConnectScene(tk.Frame):
                                         bg=controller.sbg, fg=controller.fg, command=self.passPrivacyButton)
         self.passPrivButton.grid(row=3, column=2, padx=0, pady=10)
 
-        # Mulighed for at bruge Auto-insert til inputfeltet "Password"
+       
        
         self.password.grid(row=3, column=1, padx=10, pady=10)
 
